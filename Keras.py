@@ -38,3 +38,80 @@ def factorial(n):
         return 1
     else:
         return n * factorial(n-1)
+    
+##############################
+#applying basic data augmentation augmentation techniques to image data set
+from keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
+import matplotlib.pyplot as plt
+
+# Create an instance of the ImageDataGenerator with desired augmentations
+datagen = ImageDataGenerator(
+    rotation_range=40,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
+)
+
+# Load a sample image
+img_path = 'path_to_your_image.jpg'  # Replace with the path to your cell image
+img = load_img(img_path)  # Load image
+x = img_to_array(img)  # Convert image to numpy array
+x = x.reshape((1,) + x.shape)  # Reshape image
+
+# Generate augmented images and display them
+i = 0
+for batch in datagen.flow(x, batch_size=1):
+    plt.figure(i)
+    imgplot = plt.imshow(batch[0].astype('uint8'))
+    i += 1
+    if i % 4 == 0:  # Display 4 augmented images
+        break
+
+plt.show()
+
+##############################
+#adding noise to image data for data augmentation 
+
+import numpy as np
+from keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
+import matplotlib.pyplot as plt
+
+# Custom function to add random noise to images
+def add_noise(img):
+    noise_factor = 0.2
+    noise = np.random.randn(*img.shape) * noise_factor
+    img_noisy = img + noise
+    img_noisy = np.clip(img_noisy, 0., 1.)
+    return img_noisy
+
+# Create an instance of the ImageDataGenerator with desired augmentations
+datagen = ImageDataGenerator(
+    rotation_range=40,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest',
+    preprocessing_function=add_noise  # Add custom noise function
+)
+
+# Load a sample image
+img_path = 'path_to_your_image.jpg'  # Replace with the path to your cell image
+img = load_img(img_path)  # Load image
+x = img_to_array(img) / 255.0  # Convert image to numpy array and normalize
+x = x.reshape((1,) + x.shape)  # Reshape image
+
+# Generate augmented images and display them
+i = 0
+for batch in datagen.flow(x, batch_size=1):
+    plt.figure(i)
+    imgplot = plt.imshow(batch[0])
+    i += 1
+    if i % 4 == 0:  # Display 4 augmented images
+        break
+
+plt.show()
